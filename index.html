@@ -14,9 +14,30 @@
 </head>
 
 <body>
-  <div class="loader" aria-hidden="true">
-    <div class="loader-flower">✿</div>
-    <p>With love, Sonam &amp; Shantanu</p>
+  <!-- Invitation cover — the full-screen opening experience. -->
+  <div class="invite-cover" id="inviteCover">
+    <div class="cover-panel cover-panel-left" aria-hidden="true"></div>
+    <div class="cover-panel cover-panel-right" aria-hidden="true"></div>
+    <div class="cover-mandala" aria-hidden="true"></div>
+
+    <div class="cover-content">
+      <div class="cover-floral-top" aria-hidden="true">
+        <span>✿</span><span>❀</span><span>✿</span>
+      </div>
+      <p class="cover-devanagari">शुभ विवाह</p>
+      <div class="cover-names">
+        <span class="cover-name cover-name-sonam">Sonam</span>
+        <span class="cover-amp" aria-hidden="true">&amp;</span>
+        <span class="cover-name cover-name-shantanu">Shantanu</span>
+      </div>
+      <p class="cover-invite">You are cordially invited to celebrate our wedding</p>
+      <button class="cover-open" id="openInvitation" type="button">Open Invitation</button>
+    </div>
+
+    <div class="cover-flower cover-flower-tl" aria-hidden="true">✿</div>
+    <div class="cover-flower cover-flower-tr" aria-hidden="true">❀</div>
+    <div class="cover-flower cover-flower-bl" aria-hidden="true">❀</div>
+    <div class="cover-flower cover-flower-br" aria-hidden="true">✿</div>
   </div>
 
   <div class="progress-bar" aria-hidden="true"><span></span></div>
@@ -44,7 +65,7 @@
     </nav>
   </header> -->
 
-  <main id="top">
+  <main id="top" aria-hidden="true">
     <!-- HERO -->
     <section class="hero section" data-theme="light">
       <div class="mandala mandala-left" aria-hidden="true"></div>
@@ -83,11 +104,6 @@
         </p>
 
         <p class="hero-date reveal-now">28 <small>&amp;</small> 29 November 2026</p>
-
-        <a class="scroll-cue reveal-now" href="#story">
-          <span>Scroll to explore</span>
-          <b>↓</b>
-        </a>
       </div>
     </section>
 
@@ -105,6 +121,7 @@
             <span>Our photograph</span>
             <small>Your couple photo goes here</small>
           </div>
+          <div class="photo-curtain" aria-hidden="true"></div>
         </div>
         <div class="photo-caption">Sonam &amp; Shantanu</div>
       </div>
@@ -144,7 +161,7 @@
           <div class="event-card">
           <div class="event-number">01</div>
           <div class="event-flower">✿</div>
-          <p class="event-date">28 November 2026</p>
+          <p class="event-date">28 November 2026<span class="event-time">2 PM</span></p>
           <h3>Haldi</h3>
           <p>Let the celebrations begin with sunshine, smiles and a little haldi.</p>
           </div>
@@ -154,7 +171,7 @@
           <div class="event-card">
           <div class="event-number">02</div>
           <div class="event-flower">❀</div>
-          <p class="event-date">28 November 2026</p>
+          <p class="event-date">28 November 2026<span class="event-time">6 PM</span></p>
           <h3>Sangeet</h3>
           <p>An evening of music, dance, laughter and memories to treasure.</p>
           </div>
@@ -164,7 +181,7 @@
           <div class="event-card">
           <div class="event-number">03</div>
           <div class="event-flower">✾</div>
-          <p class="event-date">29 November 2026</p>
+          <p class="event-date">29 November 2026<span class="event-time">12 PM</span></p>
           <h3>Wedding</h3>
           <p>The day we begin our forever, surrounded by everyone we love.</p>
           </div>
@@ -176,34 +193,220 @@
       </div>
     </section>
 
-    <!-- COUNTDOWN -->
-    <section class="countdown-section" data-theme="dark">
-      <div class="countdown-floral left" aria-hidden="true">✿ ❀</div>
-      <div class="countdown-floral right" aria-hidden="true">❀ ✿</div>
-
-      <p class="eyebrow reveal">The countdown begins</p>
-      <h2 class="reveal reveal-delay-1">Until we say <i>“I do”</i></h2>
-
-      <div class="countdown reveal reveal-delay-2" data-date="2026-11-29T00:00:00+05:30">
-        <div><strong data-unit="days">000</strong><span>Days</span></div>
-        <b>:</b>
-        <div><strong data-unit="hours">00</strong><span>Hours</span></div>
-        <b>:</b>
-        <div><strong data-unit="minutes">00</strong><span>Minutes</span></div>
-        <b>:</b>
-        <div><strong data-unit="seconds">00</strong><span>Seconds</span></div>
-      </div>
-    </section>
-
     <!-- VENUE -->
     <section id="venue" class="venue section" data-theme="light">
       <div class="venue-art reveal">
-        <div class="arch">
-          <div class="arch-sky"></div><div class="arch-sparkles" aria-hidden="true">✦ · ✦ · ✦</div>
-          <div class="arch-garland venue-draw">✿ ❀ ✿</div>
-          <div class="arch-path venue-draw"></div>
-          <div class="arch-flowers venue-draw">❀ ✿ ❀</div>
-        </div>
+        <svg class="mandap" viewBox="0 0 480 620" role="img" aria-label="Illustrated Indian wedding mandap">
+          <defs>
+            <radialGradient id="mg-backdrop" cx="50%" cy="45%" r="62%">
+              <stop offset="0%" stop-color="#d9bc7d" stop-opacity=".18"/>
+              <stop offset="55%" stop-color="#d9826e" stop-opacity=".08"/>
+              <stop offset="100%" stop-color="#d9826e" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="mg-halo" cx="50%" cy="55%" r="50%">
+              <stop offset="0%" stop-color="#fffaf2" stop-opacity=".85"/>
+              <stop offset="100%" stop-color="#fffaf2" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="mg-dome-g" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8a2a39"/>
+              <stop offset="100%" stop-color="#6f1f2b"/>
+            </linearGradient>
+            <linearGradient id="mg-valance-g" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#741f2c"/>
+              <stop offset="100%" stop-color="#5a1d27"/>
+            </linearGradient>
+            <radialGradient id="mg-flame-g" cx="50%" cy="78%" r="62%">
+              <stop offset="0%" stop-color="#f6e7bf"/>
+              <stop offset="45%" stop-color="#d9bc7d"/>
+              <stop offset="100%" stop-color="#b58a3c"/>
+            </radialGradient>
+            <g id="mg-flower">
+              <ellipse class="mg-petal" cx="0" cy="-5.4" rx="3.5" ry="5.6"/>
+              <ellipse class="mg-petal" cx="0" cy="-5.4" rx="3.5" ry="5.6" transform="rotate(72)"/>
+              <ellipse class="mg-petal" cx="0" cy="-5.4" rx="3.5" ry="5.6" transform="rotate(144)"/>
+              <ellipse class="mg-petal" cx="0" cy="-5.4" rx="3.5" ry="5.6" transform="rotate(216)"/>
+              <ellipse class="mg-petal" cx="0" cy="-5.4" rx="3.5" ry="5.6" transform="rotate(288)"/>
+              <circle class="mg-petal-center" r="2.1"/>
+            </g>
+            <g id="mg-toran-leaf-shape">
+              <path class="mg-toran-leaf-shape" d="M 0 0 Q 5 7 0 14 Q -5 7 0 0 Z"/>
+            </g>
+            <g id="mg-leaf">
+              <path class="mg-leaf-shape" d="M0 0 Q 5.5 -7 0 -14 Q -5.5 -7 0 0 Z"/>
+            </g>
+          </defs>
+
+          <g class="parallax-bg">
+            <ellipse cx="240" cy="310" rx="228" ry="285" fill="url(#mg-backdrop)"/>
+            <ellipse cx="240" cy="160" rx="215" ry="145" fill="url(#mg-halo)" opacity=".9"/>
+          </g>
+
+          <g class="mg-path-g">
+            <path class="mg-path" d="M 188 476 L 292 476 L 382 618 L 98 618 Z"/>
+            <path class="mg-path-edge" d="M 188 476 L 98 618"/>
+            <path class="mg-path-edge" d="M 292 476 L 382 618"/>
+          </g>
+
+          <g class="mg-pillars mg-pillars-rear">
+            <rect class="mg-pillar mg-pillar-rear" x="150" y="132" width="22" height="320" rx="4" fill="#4a1620"/>
+            <rect class="mg-pillar mg-pillar-rear" x="308" y="132" width="22" height="320" rx="4" fill="#4a1620"/>
+            <rect class="mg-pillar-gold" x="146" y="442" width="30" height="10" rx="3"/>
+            <rect class="mg-pillar-gold" x="304" y="442" width="30" height="10" rx="3"/>
+            <path class="mg-pillar-line" d="M 161 160 V 424"/>
+            <path class="mg-pillar-line" d="M 319 160 V 424"/>
+          </g>
+
+          <g class="mg-base">
+            <rect x="96" y="452" width="288" height="26" rx="7" fill="#5a1d27"/>
+            <path class="mg-goldline" d="M 106 452 H 374"/>
+            <path d="M 96 466 H 384" stroke="#d9bc7d" stroke-opacity=".35" stroke-width="1"/>
+          </g>
+
+          <g class="mg-pillars">
+            <rect class="mg-pillar" x="116" y="132" width="24" height="322" rx="5" fill="#641d29"/>
+            <rect class="mg-pillar" x="340" y="132" width="24" height="322" rx="5" fill="#641d29"/>
+            <rect class="mg-pillar-gold" x="108" y="442" width="40" height="12" rx="3"/>
+            <rect class="mg-pillar-gold" x="332" y="442" width="40" height="12" rx="3"/>
+            <path class="mg-pillar-line" d="M 122 200 V 424"/>
+            <path class="mg-pillar-line" d="M 358 200 V 424"/>
+          </g>
+
+          <g class="mg-lights" style="--d:1.15s">
+            <path d="M 118 168 Q 160 176 202 168" fill="none" stroke="#b58a3c" stroke-opacity=".5" stroke-width="1"/>
+            <circle class="mg-light" cx="148" cy="181" r="2"/>
+            <circle class="mg-light" cx="186" cy="182" r="2"/>
+            <path d="M 278 168 Q 320 176 362 168" fill="none" stroke="#b58a3c" stroke-opacity=".5" stroke-width="1"/>
+            <circle class="mg-light" cx="294" cy="182" r="2"/>
+            <circle class="mg-light" cx="332" cy="181" r="2"/>
+          </g>
+
+          <g class="mg-canopy">
+            <g class="mg-drapes">
+              <g class="mg-drape">
+                <path class="mg-drape-cloth" d="M 112 150 L 142 150 L 146 320 Q 142 328 127 328 Q 112 328 108 320 Z"/>
+                <path class="mg-drape-edge" d="M 112 150 L 146 320"/>
+                <path class="mg-drape-edge" d="M 142 150 L 108 320"/>
+                <path class="mg-drape-fold" d="M 122 152 L 120 326"/>
+                <path class="mg-drape-fold" d="M 133 152 L 134 326"/>
+                <path class="mg-tassel-cap" d="M 121 330 H 133 V 338 Q 127 343 121 338 Z"/>
+                <path class="mg-tassel-thread" d="M 124 339 V 348"/>
+                <path class="mg-tassel-thread" d="M 127 340 V 350"/>
+                <path class="mg-tassel-thread" d="M 130 339 V 348"/>
+              </g>
+              <g class="mg-drape">
+                <path class="mg-drape-cloth" d="M 158 150 L 182 150 L 185 300 Q 181 306 170 306 Q 159 306 155 300 Z"/>
+                <path class="mg-drape-edge" d="M 158 150 L 185 300"/>
+                <path class="mg-drape-edge" d="M 182 150 L 155 300"/>
+                <path class="mg-drape-fold" d="M 167 152 L 166 304"/>
+                <path class="mg-drape-fold" d="M 175 152 L 176 304"/>
+                <path class="mg-tassel-cap" d="M 164 308 H 176 V 315 Q 170 319 164 315 Z"/>
+                <path class="mg-tassel-thread" d="M 167 316 V 324"/>
+                <path class="mg-tassel-thread" d="M 170 317 V 326"/>
+                <path class="mg-tassel-thread" d="M 173 316 V 324"/>
+              </g>
+              <g class="mg-drape">
+                <path class="mg-drape-cloth" d="M 298 150 L 322 150 L 325 300 Q 321 306 310 306 Q 299 306 295 300 Z"/>
+                <path class="mg-drape-edge" d="M 298 150 L 325 300"/>
+                <path class="mg-drape-edge" d="M 322 150 L 295 300"/>
+                <path class="mg-drape-fold" d="M 305 152 L 304 304"/>
+                <path class="mg-drape-fold" d="M 314 152 L 315 304"/>
+                <path class="mg-tassel-cap" d="M 304 308 H 316 V 315 Q 310 319 304 315 Z"/>
+                <path class="mg-tassel-thread" d="M 307 316 V 324"/>
+                <path class="mg-tassel-thread" d="M 310 317 V 326"/>
+                <path class="mg-tassel-thread" d="M 313 316 V 324"/>
+              </g>
+              <g class="mg-drape">
+                <path class="mg-drape-cloth" d="M 338 150 L 368 150 L 372 320 Q 368 328 353 328 Q 338 328 334 320 Z"/>
+                <path class="mg-drape-edge" d="M 338 150 L 372 320"/>
+                <path class="mg-drape-edge" d="M 368 150 L 334 320"/>
+                <path class="mg-drape-fold" d="M 347 152 L 346 326"/>
+                <path class="mg-drape-fold" d="M 359 152 L 360 326"/>
+                <path class="mg-tassel-cap" d="M 347 330 H 359 V 338 Q 353 343 347 338 Z"/>
+                <path class="mg-tassel-thread" d="M 350 339 V 348"/>
+                <path class="mg-tassel-thread" d="M 353 340 V 350"/>
+                <path class="mg-tassel-thread" d="M 356 339 V 348"/>
+              </g>
+            </g>
+            <path class="mg-valance" d="M 70 126 H 410 V 165 Q 388.75 184 367.5 165 Q 346.25 184 325 165 Q 303.75 184 282.5 165 Q 261.25 184 240 165 Q 218.75 184 197.5 165 Q 176.25 184 155 165 Q 133.75 184 112.5 165 Q 91.25 184 70 165 Z" fill="url(#mg-valance-g)"/>
+            <path class="mg-valance-trim" d="M 70 130 H 410"/>
+            <path class="mg-valance-scallop" d="M 410 165 Q 388.75 184 367.5 165 Q 346.25 184 325 165 Q 303.75 184 282.5 165 Q 261.25 184 240 165 Q 218.75 184 197.5 165 Q 176.25 184 155 165 Q 133.75 184 112.5 165 Q 91.25 184 70 165"/>
+            <path class="mg-fold" d="M 122 130 V 161"/>
+            <path class="mg-fold" d="M 178 130 V 167"/>
+            <path class="mg-fold" d="M 240 130 V 167"/>
+            <path class="mg-fold" d="M 302 130 V 167"/>
+            <path class="mg-fold" d="M 358 130 V 161"/>
+            <path class="mg-tier tier-1" d="M 90 126 A 152 48 0 0 1 390 126 Z" fill="url(#mg-dome-g)"/>
+            <path class="mg-tier-tierline" d="M 90 126 H 390"/>
+            <path class="mg-tier tier-2" d="M 150 98 A 92 34 0 0 1 330 98 Z" fill="url(#mg-dome-g)"/>
+            <path class="mg-tier-tierline" d="M 150 98 H 330"/>
+            <path class="mg-tier tier-3" d="M 195 68 A 47 18 0 0 1 285 68 Z" fill="url(#mg-dome-g)"/>
+            <path class="mg-tier-tierline" d="M 195 68 H 285"/>
+            <g class="mg-finial">
+              <path d="M 240 30 L 244.5 50 L 235.5 50 Z" fill="#b58a3c"/>
+              <circle cx="240" cy="27" r="3.8" fill="#b58a3c"/>
+              <path d="M 240 56 Q 246 68 240 77 Q 234 68 240 56 Z" fill="#741f2c" stroke="#d9bc7d" stroke-width="1"/>
+            </g>
+          </g>
+
+          <g class="mg-toran">
+            <path class="mg-toran-string" d="M 124 176 Q 240 192 356 176"/>
+            <g class="mg-toran-leaves">
+              <g class="mg-toran-leaf" transform="translate(124 176) rotate(8)" style="--d:.7s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(147.2 179) rotate(-6)" style="--d:.75s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(170.4 181) rotate(10)" style="--d:.8s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(193.6 182.6) rotate(-8)" style="--d:.85s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(216.8 183.8) rotate(6)" style="--d:.9s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(240 184) rotate(-10)" style="--d:.95s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(263.2 183.8) rotate(8)" style="--d:.9s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(286.4 182.6) rotate(-6)" style="--d:.85s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(309.6 181) rotate(10)" style="--d:.8s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(332.8 179) rotate(-8)" style="--d:.75s"><use href="#mg-toran-leaf-shape"/></g>
+              <g class="mg-toran-leaf" transform="translate(356 176) rotate(6)" style="--d:.7s"><use href="#mg-toran-leaf-shape"/></g>
+            </g>
+          </g>
+
+          <g class="mg-garland">
+            <g class="mg-swags">
+              <g class="mg-flower-group" transform="translate(110 188) scale(.75)" style="--d:.85s"><use href="#mg-flower"/></g>
+              <g class="mg-flower-group" transform="translate(149 212)" style="--d:.95s"><use href="#mg-flower"/></g>
+              <g class="mg-flower-group alt" transform="translate(175 224) scale(.85)" style="--d:1.05s"><use href="#mg-flower"/></g>
+              <g class="mg-flower-group" transform="translate(240 238) scale(1.1)" style="--d:1.15s"><use href="#mg-flower"/></g>
+              <g class="mg-flower-group alt" transform="translate(305 224) scale(.85)" style="--d:1.05s"><use href="#mg-flower"/></g>
+              <g class="mg-flower-group" transform="translate(331 212)" style="--d:.95s"><use href="#mg-flower"/></g>
+              <g class="mg-flower-group" transform="translate(370 188) scale(.75)" style="--d:.85s"><use href="#mg-flower"/></g>
+            </g>
+            <g class="mg-leaves">
+              <g class="mg-leaf-group" transform="translate(128 204) rotate(-38)" style="--d:1.05s"><use href="#mg-leaf"/></g>
+              <g class="mg-leaf-group" transform="translate(352 204) rotate(142)" style="--d:1.05s"><use href="#mg-leaf"/></g>
+              <g class="mg-leaf-group" transform="translate(162 222) rotate(42)" style="--d:1.15s"><use href="#mg-leaf"/></g>
+              <g class="mg-leaf-group" transform="translate(318 222) rotate(-138)" style="--d:1.15s"><use href="#mg-leaf"/></g>
+            </g>
+          </g>
+
+          <g class="mg-diyas parallax-fg">
+            <g class="mg-diya" style="--d:1.35s">
+              <circle class="mg-flame-glow" cx="140" cy="455" r="12"/>
+              <path class="mg-flame" d="M 140 446 Q 145 456 140 462 Q 135 456 140 446 Z"/>
+              <path class="mg-diya-bowl" d="M 129 466 Q 140 483 151 466 Z"/>
+              <path class="mg-diya-rim" d="M 127 466 H 153"/>
+              <circle cx="140" cy="467" r="4.2" fill="#f6e7bf"/>
+            </g>
+            <g class="mg-diya" transform="translate(200 0)" style="--d:1.45s">
+              <circle class="mg-flame-glow" cx="140" cy="455" r="12"/>
+              <path class="mg-flame" d="M 140 446 Q 145 456 140 462 Q 135 456 140 446 Z"/>
+              <path class="mg-diya-bowl" d="M 129 466 Q 140 483 151 466 Z"/>
+              <path class="mg-diya-rim" d="M 127 466 H 153"/>
+              <circle cx="140" cy="467" r="4.2" fill="#f6e7bf"/>
+            </g>
+          </g>
+
+          <g class="mg-scatter parallax-fg">
+            <g class="mg-flower-group" transform="translate(118 430) scale(.55)" style="--d:1.2s"><use href="#mg-flower"/></g>
+            <g class="mg-flower-group alt" transform="translate(362 430) scale(.55)" style="--d:1.3s"><use href="#mg-flower"/></g>
+            <g class="mg-leaf-group" transform="translate(131 428) rotate(120)" style="--d:1.25s"><use href="#mg-leaf"/></g>
+            <g class="mg-leaf-group" transform="translate(349 428) rotate(-120)" style="--d:1.35s"><use href="#mg-leaf"/></g>
+          </g>
+        </svg>
       </div>
 
       <div class="venue-copy reveal reveal-delay-1">
@@ -221,6 +424,25 @@
       </div>
     </section>
 
+    <!-- COUNTDOWN -->
+    <section class="countdown-section" data-theme="dark">
+      <div class="countdown-floral left" aria-hidden="true">✿ ❀</div>
+      <div class="countdown-floral right" aria-hidden="true">❀ ✿</div>
+
+      <p class="eyebrow reveal">The countdown begins</p>
+      <h2 class="reveal reveal-delay-1">Until we say <i>“I do”</i></h2>
+
+      <div class="countdown reveal reveal-delay-2" data-date="2026-11-28T00:00:00+05:30">
+        <div><strong data-unit="days">000</strong><span>Days</span></div>
+        <b>:</b>
+        <div><strong data-unit="hours">00</strong><span>Hours</span></div>
+        <b>:</b>
+        <div><strong data-unit="minutes">00</strong><span>Minutes</span></div>
+        <b>:</b>
+        <div><strong data-unit="seconds">00</strong><span>Seconds</span></div>
+      </div>
+    </section>
+
     <!-- FOOTER -->
     <footer class="footer">
       <div class="footer-floral">✿</div>
@@ -229,6 +451,16 @@
       <p class="footer-small">With love, always.</p>
     </footer>
   </main>
+
+  <!-- Discreet floating music control; hidden until the invitation is opened. -->
+  <button class="music-toggle" id="musicToggle" type="button" aria-label="Pause music" hidden>
+    <span class="music-glyph" aria-hidden="true">♫</span>
+  </button>
+
+  <!-- Background music. Played only after the visitor taps "Open Invitation". -->
+  <audio id="weddingMusic" loop preload="auto" aria-hidden="true">
+    <source src="./wedding-music.mp3" type="audio/mpeg">
+  </audio>
 
   <script src="script.js"></script>
 </body>

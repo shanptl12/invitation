@@ -1,10 +1,90 @@
 (() => {
   const body = document.body;
+  const cover = document.getElementById("inviteCover");
+  const coverBtn = document.getElementById("openInvitation");
+  const music = document.getElementById("weddingMusic");
+  const musicToggle = document.getElementById("musicToggle");
+  const main = document.getElementById("top");
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  window.addEventListener("load", () => {
-    setTimeout(() => body.classList.add("loaded"), 250);
-    setTimeout(() => document.querySelector(".loader")?.classList.add("is-hidden"), 850);
-  });
+  let opened = false;
+  let musicStarted = false;
+
+  /* ------------------------------------------------------------------
+   * Cover intro sequence
+   * Lock the scroll, paint the cover, then on the next frame add
+   * `cover-loaded` so the staggered fade-up animation can run.
+   * ------------------------------------------------------------------ */
+  body.classList.add("cover-active");
+  requestAnimationFrame(() => requestAnimationFrame(() => body.classList.add("cover-loaded")));
+
+  /* ------------------------------------------------------------------
+   * Music — started only after the user clicks "Open Invitation".
+   * Browsers block audio that tries to autoplay before a user gesture,
+   * so play() is deliberately called from inside the click handler.
+   * ------------------------------------------------------------------ */
+  const MUSIC_TARGET_VOLUME = 0.4;
+  const MUSIC_FADE_MS = prefersReduced ? 300 : 2000;
+
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    music.volume = 0;
+    music.play().catch(() => { /* file missing / blocked — continue silently */ });
+
+    /* Fade-in: ramp the volume from 0 to MUSIC_TARGET_VOLUME over
+     * MUSIC_FADE_MS using requestAnimationFrame, so the music eases in
+     * smoothly instead of popping in at full volume. */
+    const start = performance.now();
+    (function ramp(now) {
+      const t = Math.min(1, (now - start) / MUSIC_FADE_MS);
+      music.volume = MUSIC_TARGET_VOLUME * t;
+      if (t < 1) requestAnimationFrame(ramp);
+    })(start);
+  }
+
+  /* ------------------------------------------------------------------
+   * Music toggle — pause/resume. play()/pause() are the only calls, so
+   * scrolling, opening menus or following section links never restart
+   * the song. The volume stays at the faded-in level.
+   * ------------------------------------------------------------------ */
+  function setPlaying(playing) {
+    musicToggle.classList.toggle("is-playing", playing);
+    musicToggle.classList.toggle("is-paused", !playing);
+    musicToggle.querySelector(".music-glyph").textContent = playing ? "♫" : "♪";
+    musicToggle.setAttribute("aria-label", playing ? "Pause music" : "Play music");
+    if (playing) music.play().catch(() => {});
+    else music.pause();
+  }
+  musicToggle.addEventListener("click", () => setPlaying(music.paused));
+
+  /* ------------------------------------------------------------------
+   * Opening transition — triggered by clicking the Open button.
+   * The button press, music start and card-open classes are applied
+   * together. Once the transition has played out, `body.loaded` is added
+   * so the hero performs its normal entrance, and the cover is removed.
+   * ------------------------------------------------------------------ */
+  const OPEN_DELAY = prefersReduced ? 350 : 1300;
+
+  function openInvitation() {
+    if (opened) return;
+    opened = true;
+    coverBtn.classList.add("is-pressed");
+    startMusic();
+    body.classList.add("cover-opening");
+    body.classList.remove("cover-active");
+    main.setAttribute("aria-hidden", "false");
+    window.setTimeout(() => {
+      body.classList.add("loaded");
+      musicToggle.hidden = false;
+      cover.classList.add("is-gone");
+      window.setTimeout(() => {
+        cover.remove();
+        body.classList.remove("cover-opening");
+      }, 700);
+    }, OPEN_DELAY);
+  }
+  coverBtn.addEventListener("click", openInvitation);
 
   const revealItems = document.querySelectorAll(".reveal");
   const observer = new IntersectionObserver((entries, obs) => {
@@ -17,11 +97,41 @@
   }, { threshold: 0.13, rootMargin: "0px 0px -40px 0px" });
   revealItems.forEach(item => observer.observe(item));
 
+  const garland = document.querySelector(".mg-garland");
+  function qPoint(x0, y0, cx, cy, x1, y1, t) {
+    const mt = 1 - t;
+    return { x: mt * mt * x0 + 2 * mt * t * cx + t * t * x1, y: mt * mt * y0 + 2 * mt * t * cy + t * t * y1 };
+  }
+  function buildMarigolds() {
+    if (!garland) return;
+    const ns = "http://www.w3.org/2000/svg";
+    const main = Array.from({ length: 21 }, (_, i) => i / 20).map(t => qPoint(110, 182, 240, 294, 370, 182, t));
+    const sub = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9].map(t => qPoint(122, 190, 240, 302, 358, 190, t));
+    const mk = (p, r, color, delay) => {
+      const c = document.createElementNS(ns, "circle");
+      c.setAttribute("cx", p.x.toFixed(1));
+      c.setAttribute("cy", p.y.toFixed(1));
+      c.setAttribute("r", r);
+      c.setAttribute("class", "mg-marigold");
+      c.setAttribute("fill", color);
+      c.style.setProperty("--d", `${delay}s`);
+      return c;
+    };
+    const frag = document.createDocumentFragment();
+    main.forEach((p, i) => frag.appendChild(mk(p, 4.6, i % 2 ? "#b58a3c" : "#ca8743", 0.55 + i * 0.028)));
+    sub.forEach((p, i) => frag.appendChild(mk(p, 4.0, i % 2 ? "#d9826e" : "#d9a25f", 0.6 + i * 0.04)));
+    garland.prepend(frag);
+  }
+  buildMarigolds();
+
   const progress = document.querySelector(".progress-bar span");
   const blooms = [...document.querySelectorAll(".vine-bloom")];
   const vine = document.querySelector(".vine-track");
   const timelineProgress = document.querySelector(".timeline-progress span");
   const celebration = document.querySelector("#celebrations");
+  const mandapArt = document.querySelector(".venue-art .mandap");
+  const mandapBg = mandapArt?.querySelector(".parallax-bg");
+  const mandapFg = mandapArt?.querySelector(".parallax-fg");
   let ticking = false;
 
   function updateScrollEffects() {
@@ -36,6 +146,13 @@
       const rect = celebration.getBoundingClientRect();
       const visible = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (window.innerHeight + rect.height)));
       timelineProgress.style.width = `${Math.max(0, Math.min(100, visible * 135 - 12))}%`;
+    }
+
+    if (mandapArt && mandapBg && mandapFg) {
+      const rect = mandapArt.getBoundingClientRect();
+      const offset = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - window.innerHeight / 2) / (window.innerHeight * 0.55)));
+      mandapBg.style.setProperty("--mg-bg", `${offset * 7}px`);
+      mandapFg.style.setProperty("--mg-fg", `${-offset * 4}px`);
     }
     ticking = false;
   }
