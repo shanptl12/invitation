@@ -26,12 +26,7 @@
   const MUSIC_TARGET_VOLUME = 0.4;
   const MUSIC_FADE_MS = prefersReduced ? 300 : 2000;
 
-  function startMusic() {
-    if (musicStarted) return;
-    musicStarted = true;
-    music.volume = 0;
-    music.play().catch(() => { /* file missing / blocked — continue silently */ });
-
+  function fadeInMusic() {
     /* Fade-in: ramp the volume from 0 to MUSIC_TARGET_VOLUME over
      * MUSIC_FADE_MS using requestAnimationFrame, so the music eases in
      * smoothly instead of popping in at full volume. */
@@ -41,6 +36,37 @@
       music.volume = MUSIC_TARGET_VOLUME * t;
       if (t < 1) requestAnimationFrame(ramp);
     })(start);
+  }
+
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    music.volume = 0;
+
+    music.play().then(() => {
+      // Playback genuinely started — reflect that in the toggle icon.
+      musicToggle.classList.add("is-playing");
+      musicToggle.classList.remove("is-paused");
+      musicToggle.querySelector(".music-glyph").textContent = "♫";
+      musicToggle.setAttribute("aria-label", "Pause music");
+      fadeInMusic();
+    }).catch(err => {
+      // Log the REAL reason instead of swallowing it. Open this on the
+      // Android device via chrome://inspect (USB debugging) to see
+      // whether it's NotAllowedError (autoplay/gesture blocked by the
+      // browser context, e.g. an in-app WebView) or NotSupportedError
+      // (the mp3/m4a file itself failed to load or decode).
+      console.warn("[weddingMusic] autoplay failed:", err && err.name, err && err.message);
+      musicStarted = false;
+      // Leave the toggle showing "paused" (♪) so the visitor sees an
+      // accurate state and can tap it themselves — a direct tap is a
+      // fresh user gesture and will satisfy the browser's autoplay
+      // policy even when the automatic attempt above didn't.
+      musicToggle.classList.add("is-paused");
+      musicToggle.classList.remove("is-playing");
+      musicToggle.querySelector(".music-glyph").textContent = "♪";
+      musicToggle.setAttribute("aria-label", "Play music");
+    });
   }
 
   /* ------------------------------------------------------------------
@@ -53,8 +79,17 @@
     musicToggle.classList.toggle("is-paused", !playing);
     musicToggle.querySelector(".music-glyph").textContent = playing ? "♫" : "♪";
     musicToggle.setAttribute("aria-label", playing ? "Pause music" : "Play music");
-    if (playing) music.play().catch(() => {});
-    else music.pause();
+    if (playing) {
+      music.play().catch(err => {
+        console.warn("[weddingMusic] manual play() failed:", err && err.name, err && err.message);
+        musicToggle.classList.remove("is-playing");
+        musicToggle.classList.add("is-paused");
+        musicToggle.querySelector(".music-glyph").textContent = "♪";
+        musicToggle.setAttribute("aria-label", "Play music");
+      });
+    } else {
+      music.pause();
+    }
   }
   musicToggle.addEventListener("click", () => setPlaying(music.paused));
 
