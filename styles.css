@@ -240,20 +240,60 @@ body.cover-active { overflow: hidden; }
 }
 
 .cover-open {
+  position: relative;
+  overflow: hidden;
   margin-top: 32px;
   padding: 16px 44px;
   min-height: 54px;
-  border: 1px solid var(--gold);
-  background: transparent;
-  color: var(--maroon);
+  border: 1px solid var(--maroon);
+  background: var(--maroon);
+  color: var(--paper);
   font: 600 12px "DM Sans", sans-serif;
   letter-spacing: .18em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color .3s ease, background .3s ease, box-shadow .3s ease, transform .3s ease;
+  animation:
+    coverZoom 2.5s ease-in-out infinite,
+    coverGlow 2.5s ease-in-out infinite;
+  transition: color .3s ease, background .3s ease;
 }
 
-.cover-open:hover { background: rgba(116,31,44,.06); }
+/* A light streak that continuously sweeps across the button face. */
+.cover-open::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(115deg, transparent 0%, rgba(255, 250, 242, .22) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  animation: coverShimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cover-open:hover {
+  background: #7d2433;
+}
+
+@keyframes coverZoom {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+@keyframes coverShimmer {
+  0%       { left: -60%; }
+  55%, 100% { left: 130%; }
+}
+
+@keyframes coverGlow {
+  0%, 100% {
+    box-shadow: 0 8px 22px rgba(116, 31, 44, .25), 0 0 8px 1px rgba(181, 138, 60, .4);
+  }
+  50% {
+    box-shadow: 0 10px 28px rgba(116, 31, 44, .35), 0 0 24px 8px rgba(181, 138, 60, .55);
+  }
+}
 
 .cover-open:focus-visible {
   outline: 2px solid var(--gold);
@@ -262,7 +302,6 @@ body.cover-active { overflow: hidden; }
 
 /* Brief press feedback: the gold border glows and widens. */
 .cover-open.is-pressed {
-  color: var(--maroon-dark);
   border-color: var(--gold-light);
   animation: coverPress .5s ease;
 }
@@ -305,6 +344,13 @@ body.cover-loaded .cover-invite,
 body.cover-loaded .cover-open {
   animation: coverRise .65s cubic-bezier(.2,.8,.2,1) forwards;
   animation-delay: .10s;
+}
+
+/* The button alone keeps its perpetual attention animations after the intro. */
+body.cover-loaded .cover-open {
+  animation: coverRise .65s cubic-bezier(.2,.8,.2,1) forwards,
+    coverZoom 2.5s ease-in-out .7s infinite,
+    coverGlow 2.5s ease-in-out .7s infinite;
 }
 
 body.cover-loaded .cover-flower { animation: coverFlowerIn .9s ease forwards; animation-delay: .10s; }
@@ -529,13 +575,16 @@ body.loaded .nav { opacity: 1; }
   transform: translateX(-50%);
   z-index: 5;
   text-decoration: none;
-  color: var(--muted);
-  font-size: 11px;
+  color: var(--maroon);
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: .18em;
   text-transform: uppercase;
   opacity: 0;
-  transition: opacity .8s ease;
+  transition: color .3s ease, opacity .8s ease;
 }
+
+.scroll-cue:hover { color: var(--gold); }
 
 body.loaded .scroll-cue {
   opacity: 1;
@@ -543,16 +592,33 @@ body.loaded .scroll-cue {
 }
 
 .scroll-cue span {
-  display: block;
-  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin: 10px auto 0;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
   color: var(--gold);
-  font-size: 20px;
-  animation: bounce 2s ease-in-out infinite;
+  font-size: 18px;
+  animation: bounce 2s ease-in-out infinite, cueGlow 2.5s ease-in-out infinite;
+  transition: background .3s ease, box-shadow .3s ease;
+}
+
+.scroll-cue:hover span {
+  background: rgba(181, 138, 60, .12);
+  box-shadow: 0 0 16px 6px rgba(181, 138, 60, .35);
 }
 
 @keyframes bounce {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(7px); }
+}
+
+@keyframes cueGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(181, 138, 60, .25); }
+  50%      { box-shadow: 0 0 16px 5px rgba(181, 138, 60, .5); }
 }
 
 .mandala {
@@ -849,30 +915,32 @@ body.loaded .scroll-cue {
 
 .event-date {
   color: var(--gold);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
 }
 
 .event-time {
   display: block;
-  margin-top: 4px;
+  margin-top: 5px;
   color: var(--maroon);
-  letter-spacing: .18em;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .16em;
 }
 
 .event h3 {
   margin: 12px 0 8px;
   color: var(--maroon);
-  font: 600 35px "Cormorant Garamond", serif;
+  font: italic 600 35px "Cormorant Garamond", serif;
 }
 
 .event p:not(.event-date) {
   max-width: 260px;
   margin: auto;
   color: var(--muted);
-  font: 400 17px/1.6 "Cormorant Garamond", serif;
+  font: 400 14px/1.6 "Cormorant Garamond", serif;
 }
 
 .scrolling-floral-line {
@@ -1208,7 +1276,7 @@ body.loaded .scroll-cue {
 .footer-names span { color: var(--gold-light); }
 
 .footer p:not(.footer-names):not(.footer-small) {
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: .16em;
   text-transform: uppercase;
 }
@@ -1217,6 +1285,27 @@ body.loaded .scroll-cue {
   margin-top: 28px;
   color: var(--gold-light);
   font: 400 16px "Cormorant Garamond", serif;
+}
+
+.footer p.footer-family {
+  margin-top: 14px;
+  color: var(--paper);
+  font: 500 35px/1.2 "Cormorant Garamond", serif;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.footer p.footer-request {
+  margin-top: 12px;
+  color: rgba(255, 250, 242, .85);
+  font: 400 19px/1.55 "Cormorant Garamond", serif;
+  text-transform: none;
+  letter-spacing: .02em;
+}
+
+@media (max-width: 600px) {
+  .footer p.footer-family { font-size: 27px; }
+  .footer p.footer-request { font-size: 17px; }
 }
 
 .petal-layer {
@@ -1528,6 +1617,8 @@ body.loaded .name-word i { animation:letterRise .85s cubic-bezier(.2,.8,.2,1) fo
     transform: none !important;
     animation: none !important;
   }
+
+  .cover-open::after { animation: none !important; }
 
   .cover-flower { opacity: .55 !important; animation: none !important; }
   .cover-mandala { opacity: .7 !important; animation: none !important; }

@@ -239,4 +239,18 @@
     Object.entries(values).forEach(([unit,value])=>{const el=countdown.querySelector(`[data-unit="${unit}"]`);if(el&&el.textContent!==value){el.animate([{transform:"translateY(-8px)",opacity:.25},{transform:"translateY(0)",opacity:1}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});el.textContent=value;}});
   }
   updateCountdown(); setInterval(updateCountdown,1000);
+
+  /* ------------------------------------------------------------------
+   * Footer family-invitation variant
+   * Default: both families. Query params pick a single-family version:
+   *   ?family=patil     → sent by groom's family
+   *   ?family=kaslikar  → sent by bride's family
+   * ------------------------------------------------------------------ */
+  const familySide = new URLSearchParams(window.location.search).get("family");
+  const footerFamily = document.getElementById("footerFamily");
+  const footerRequest = document.getElementById("footerRequest");
+  if (footerFamily && footerRequest && (familySide === "patil" || familySide === "kaslikar")) {
+    footerFamily.textContent = familySide === "patil" ? "Jaymala and Madhukar Patil" : "Mala and Suresh Kaslikar";
+    footerRequest.innerHTML = "cordially invites you to<br>the wedding celebrations";
+  }
 })();
