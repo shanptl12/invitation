@@ -251,6 +251,6 @@
   const footerRequest = document.getElementById("footerRequest");
   if (footerFamily && footerRequest && (familySide === "patil" || familySide === "kaslikar")) {
     footerFamily.textContent = familySide === "patil" ? "Jaymala and Madhukar Patil" : "Mala and Suresh Kaslikar";
-    footerRequest.innerHTML = "cordially invites you to<br>the wedding celebrations";
+    footerRequest.innerHTML = "cordially invite you to<br>the wedding celebrations";
   }
 })();
