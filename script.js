@@ -9,6 +9,7 @@
 
   let opened = false;
   let musicStarted = false;
+  let retryHandler = null;
 
   /* ------------------------------------------------------------------
    * Cover intro sequence
@@ -25,30 +26,61 @@
    * ------------------------------------------------------------------ */
   const MUSIC_TARGET_VOLUME = 0.4;
   const MUSIC_FADE_MS = prefersReduced ? 300 : 2000;
+  const RETRY_EVENTS = ["pointerdown", "pointerup", "touchend", "click", "keydown", "scroll"];
+  const RETRYABLE_ERRORS = ["NotAllowedError", "AbortError"];
 
+  function applyPlayingUI(playing) {
+    musicToggle.classList.toggle("is-playing", playing);
+    musicToggle.classList.toggle("is-paused", !playing);
+    musicToggle.querySelector(".music-glyph").textContent = playing ? "♫" : "♪";
+    musicToggle.setAttribute("aria-label", playing ? "Pause music" : "Play music");
+  }
+
+  function disarmRetry() {
+    if (!retryHandler) return;
+    RETRY_EVENTS.forEach(evt => window.removeEventListener(evt, retryHandler));
+    retryHandler = null;
+  }
+
+  function armRetry() {
+    if (retryHandler) return;
+    retryHandler = () => {
+      disarmRetry();
+      startMusic();
+    };
+    RETRY_EVENTS.forEach(evt => window.addEventListener(evt, retryHandler, { passive: true }));
+  }
+
+  /* Timer-driven, not requestAnimationFrame: rAF is throttled to a stop in
+   * Android WebViews, in-app browsers and backgrounded tabs, which used to
+   * strand the ramp half-finished and leave the track silent. */
   function fadeInMusic() {
-    /* Fade-in: ramp the volume from 0 to MUSIC_TARGET_VOLUME over
-     * MUSIC_FADE_MS using requestAnimationFrame, so the music eases in
-     * smoothly instead of popping in at full volume. */
     const start = performance.now();
-    (function ramp(now) {
-      const t = Math.min(1, (now - start) / MUSIC_FADE_MS);
+    (function ramp() {
+      const t = Math.min(1, (performance.now() - start) / MUSIC_FADE_MS);
       music.volume = MUSIC_TARGET_VOLUME * t;
-      if (t < 1) requestAnimationFrame(ramp);
-    })(start);
+      if (t < 1) window.setTimeout(ramp, 50);
+    })();
+  }
+
+  /* Backstop for the case where play() never settles at all — the element
+   * would otherwise stay at volume 0 forever while reporting as playing. */
+  function ensureAudible() {
+    window.setTimeout(() => {
+      if (music.volume < MUSIC_TARGET_VOLUME) music.volume = MUSIC_TARGET_VOLUME;
+    }, MUSIC_FADE_MS + 2000);
   }
 
   function startMusic() {
     if (musicStarted) return;
     musicStarted = true;
     music.volume = 0;
+    ensureAudible();
 
     music.play().then(() => {
       // Playback genuinely started — reflect that in the toggle icon.
-      musicToggle.classList.add("is-playing");
-      musicToggle.classList.remove("is-paused");
-      musicToggle.querySelector(".music-glyph").textContent = "♫";
-      musicToggle.setAttribute("aria-label", "Pause music");
+      disarmRetry();
+      applyPlayingUI(true);
       fadeInMusic();
     }).catch(err => {
       // Log the REAL reason instead of swallowing it. Open this on the
@@ -62,10 +94,10 @@
       // accurate state and can tap it themselves — a direct tap is a
       // fresh user gesture and will satisfy the browser's autoplay
       // policy even when the automatic attempt above didn't.
-      musicToggle.classList.add("is-paused");
-      musicToggle.classList.remove("is-playing");
-      musicToggle.querySelector(".music-glyph").textContent = "♪";
-      musicToggle.setAttribute("aria-label", "Play music");
+      applyPlayingUI(false);
+      // Only gesture-policy and interruption failures are worth retrying;
+      // a decode or format error fails identically on every attempt.
+      if (err && RETRYABLE_ERRORS.indexOf(err.name) !== -1) armRetry();
     });
   }
 
@@ -75,19 +107,18 @@
    * the song. The volume stays at the faded-in level.
    * ------------------------------------------------------------------ */
   function setPlaying(playing) {
-    musicToggle.classList.toggle("is-playing", playing);
-    musicToggle.classList.toggle("is-paused", !playing);
-    musicToggle.querySelector(".music-glyph").textContent = playing ? "♫" : "♪";
-    musicToggle.setAttribute("aria-label", playing ? "Pause music" : "Play music");
+    disarmRetry();
     if (playing) {
-      music.play().catch(err => {
+      musicStarted = true;
+      music.volume = MUSIC_TARGET_VOLUME;
+      music.play().then(() => applyPlayingUI(true)).catch(err => {
         console.warn("[weddingMusic] manual play() failed:", err && err.name, err && err.message);
-        musicToggle.classList.remove("is-playing");
-        musicToggle.classList.add("is-paused");
-        musicToggle.querySelector(".music-glyph").textContent = "♪";
-        musicToggle.setAttribute("aria-label", "Play music");
+        musicStarted = false;
+        applyPlayingUI(false);
+        if (err && RETRYABLE_ERRORS.indexOf(err.name) !== -1) armRetry();
       });
     } else {
+      applyPlayingUI(false);
       music.pause();
     }
   }
@@ -160,8 +191,6 @@
   buildMarigolds();
 
   const progress = document.querySelector(".progress-bar span");
-  const blooms = [...document.querySelectorAll(".vine-bloom")];
-  const vine = document.querySelector(".vine-track");
   const timelineProgress = document.querySelector(".timeline-progress span");
   const celebration = document.querySelector("#celebrations");
   const mandapArt = document.querySelector(".venue-art .mandap");
@@ -174,8 +203,6 @@
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     const pageProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
     progress.style.width = `${pageProgress * 100}%`;
-    document.documentElement.style.setProperty("--section-progress", pageProgress);
-    blooms.forEach((bloom, index) => bloom.classList.toggle("is-grown", pageProgress >= [0.18, 0.42, 0.67, 0.91][index]));
 
     if (celebration && timelineProgress) {
       const rect = celebration.getBoundingClientRect();
@@ -235,10 +262,78 @@
   const weddingDate=countdown?new Date(countdown.dataset.date).getTime():null;
   function updateCountdown(){
     if(!weddingDate)return; const distance=Math.max(0,weddingDate-Date.now());
-    const values={days:String(Math.floor(distance/86400000)).padStart(3,"0"),hours:String(Math.floor(distance%86400000/3600000)).padStart(2,"0"),minutes:String(Math.floor(distance%3600000/60000)).padStart(2,"0"),seconds:String(Math.floor(distance%60000/1000)).padStart(2,"0")};
+    /* Days are shown unpadded (63, not 063); the clock units stay
+     * zero-padded to two digits so the row keeps its fixed rhythm. */
+    const values={days:String(Math.floor(distance/86400000)),hours:String(Math.floor(distance%86400000/3600000)).padStart(2,"0"),minutes:String(Math.floor(distance%3600000/60000)).padStart(2,"0"),seconds:String(Math.floor(distance%60000/1000)).padStart(2,"0")};
     Object.entries(values).forEach(([unit,value])=>{const el=countdown.querySelector(`[data-unit="${unit}"]`);if(el&&el.textContent!==value){el.animate([{transform:"translateY(-8px)",opacity:.25},{transform:"translateY(0)",opacity:1}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});el.textContent=value;}});
   }
   updateCountdown(); setInterval(updateCountdown,1000);
+
+  /* ------------------------------------------------------------------
+   * Name auto-fit
+   * The couple's names are set in Cormorant Garamond and marked
+   * `white-space: nowrap`, so a long name like SHANTANU cannot wrap —
+   * it simply overflows its box and gets clipped by the section's
+   * `overflow: hidden`. The responsive font sizes are tuned in vw, and
+   * between roughly 430px and 505px of viewport width they ask for more
+   * room than the 90vw column provides, so the last letters disappear.
+   * Instead of hand-tuning more breakpoints, measure the natural width
+   * of every name and publish a single scale factor as `--name-fit`,
+   * which the CSS multiplies into the base font size. The factor is
+   * never above 1, so names stay as large as the design allows.
+   * ------------------------------------------------------------------ */
+  const FIT_GROUPS = [
+    { group: document.querySelector(".hero-names"), items: ".name-word" },
+    { group: document.querySelector(".cover-names"), items: ".cover-name" }
+  ].filter(entry => entry.group);
+
+  /* Width the name would need if it were allowed to be as wide as it
+   * likes — this is the number the layout has to fit inside. */
+  function naturalWidth(el) {
+    const prevWidth = el.style.width;
+    const prevMaxWidth = el.style.maxWidth;
+    el.style.width = "max-content";
+    el.style.maxWidth = "none";
+    const width = el.getBoundingClientRect().width;
+    el.style.width = prevWidth;
+    el.style.maxWidth = prevMaxWidth;
+    return width;
+  }
+
+  function fitNames() {
+    FIT_GROUPS.forEach(({ group, items }) => {
+      const names = [...group.querySelectorAll(items)];
+      if (!names.length) return;
+
+      /* Measure at the unscaled size: a leftover factor from an earlier
+       * pass would otherwise compound every resize. */
+      group.style.setProperty("--name-fit", "1");
+      const available = group.clientWidth;
+      const widest = names.reduce((max, el) => Math.max(max, naturalWidth(el)), 0);
+      if (!available || !widest) return;
+
+      /* 0.5% of slack absorbs sub-pixel rounding so the last glyph's
+       * right edge can never land exactly on the clip boundary. */
+      const scale = widest > available ? (available / widest) * 0.995 : 1;
+      group.style.setProperty("--name-fit", String(scale));
+    });
+  }
+
+  if (FIT_GROUPS.length) {
+    /* Web fonts change the metrics, so re-fit once they have landed —
+     * the fallback serif is noticeably wider than Cormorant. */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNames);
+    else fitNames();
+
+    let fitPending = false;
+    const refit = () => {
+      if (fitPending) return;
+      fitPending = true;
+      requestAnimationFrame(() => { fitPending = false; fitNames(); });
+    };
+    window.addEventListener("resize", refit);
+    window.addEventListener("orientationchange", refit);
+  }
 
   /* ------------------------------------------------------------------
    * Footer family-invitation variant

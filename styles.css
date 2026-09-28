@@ -147,15 +147,19 @@ body.cover-active { overflow: hidden; }
 
 .cover-panel-left {
   left: 12px;
-  border-right-color: rgba(181,138,60,.28);
+  border-right-color: transparent;
   transform-origin: right center;
 }
 
+.cover-panel-left::before { border-right-color: transparent; }
+
 .cover-panel-right {
   right: 12px;
-  border-left-color: rgba(181,138,60,.28);
+  border-left-color: transparent;
   transform-origin: left center;
 }
+
+.cover-panel-right::before { border-left-color: transparent; }
 
 .cover-mandala {
   position: absolute;
@@ -221,7 +225,7 @@ body.cover-active { overflow: hidden; }
 
 .cover-name {
   color: var(--maroon);
-  font: 500 clamp(52px, 13vw, 96px)/.92 "Cormorant Garamond", serif;
+  font: 500 calc(clamp(52px, 13vw, 96px) * var(--name-fit, 1))/.92 "Cormorant Garamond", serif;
   letter-spacing: .045em;
   text-transform: uppercase;
 }
@@ -513,7 +517,7 @@ body.loaded .nav { opacity: 1; }
 .hero-names {
   margin: 0;
   color: var(--maroon);
-  font: 500 clamp(58px, 9vw, 112px)/.78 "Cormorant Garamond", serif;
+  font: 500 calc(clamp(58px, 9vw, 112px) * var(--name-fit, 1))/.78 "Cormorant Garamond", serif;
   letter-spacing: .045em;
   text-transform: uppercase;
 }
@@ -1373,19 +1377,11 @@ body.loaded .reveal-now:nth-child(8) { transition-delay: .8s; }
    INTERACTIVE MOTION LAYER
    ========================= */
 
-:root { --section-progress: 0; }
 body { transition: background-color .8s ease, color .8s ease; }
 body.theme-dark { background: var(--maroon); }
 body.theme-dark .nav { background: rgba(83,29,39,.82); border-color: rgba(217,188,125,.22); }
 body.theme-dark .nav-brand, body.theme-dark .nav-menu a { color: var(--paper); }
 body.theme-dark .nav-brand span { color: var(--gold-light); }
-
-.botanical-vine { position: fixed; top: 8vh; right: 27px; width: 32px; height: 84vh; z-index: 55; pointer-events: none; opacity: .78; }
-.vine-track { position: absolute; top: 0; left: 15px; width: 1px; height: calc(var(--section-progress) * 100%); max-height: 100%; background: linear-gradient(to bottom, var(--gold), var(--sage)); transform-origin: top; }
-.vine-track::after { content:""; position:absolute; left:-2px; bottom:-1px; width:5px; height:5px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 5px rgba(181,138,60,.08); }
-.vine-bloom { position:absolute; left:2px; color:var(--rose); font-style:normal; font-size:19px; opacity:0; transform:scale(.3) rotate(-30deg); transition:opacity .7s ease, transform .8s cubic-bezier(.2,1.4,.3,1); }
-.vine-bloom.is-grown { opacity:1; transform:scale(1) rotate(0); }
-.bloom-1{top:18%}.bloom-2{top:42%;color:var(--gold)}.bloom-3{top:67%;color:var(--sage)}.bloom-4{top:91%}
 
 .name-word { display:block; white-space:nowrap; }
 .name-word i { display:inline-block; font-style:normal; opacity:0; transform:translateY(35px) rotate(4deg); filter:blur(3px); }
@@ -1462,8 +1458,8 @@ body.loaded .name-word i { animation:letterRise .85s cubic-bezier(.2,.8,.2,1) fo
 .rsvp.is-visible .envelope-paper { transform:translateY(-18px); opacity:1; }
 .envelope-paper span{color:var(--gold);font:400 12px "Cormorant Garamond",serif}.envelope-paper b{color:var(--maroon);font:600 17px "Cormorant Garamond",serif;letter-spacing:.08em}.rsvp-envelope .button{position:relative;z-index:4}
 
-@media (max-width:800px){.botanical-vine{right:10px;opacity:.5}.timeline-progress{display:none}.event-card{min-height:auto}}
-@media (prefers-reduced-motion:reduce){.botanical-vine,.petal-layer,.photo-curtain{display:none}.name-word i,.story-lines span,.event-card,.photo-inner,.photo-inner img,.photo-inner::before,.envelope-flap,.envelope-paper{opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important}.story-photo{animation:none!important}}
+@media (max-width:800px){.timeline-progress{display:none}.event-card{min-height:auto}}
+@media (prefers-reduced-motion:reduce){.petal-layer,.photo-curtain{display:none}.name-word i,.story-lines span,.event-card,.photo-inner,.photo-inner img,.photo-inner::before,.envelope-flap,.envelope-paper{opacity:1!important;transform:none!important;filter:none!important;clip-path:none!important}.story-photo{animation:none!important}}
 
 @media (max-width: 800px) {
   body::before { inset: 7px; }
@@ -1522,7 +1518,7 @@ body.loaded .name-word i { animation:letterRise .85s cubic-bezier(.2,.8,.2,1) fo
   .floral-hero-left { left: -70px; top: -50px; }
   .floral-hero-right { right: -70px; bottom: -50px; transform: rotate(180deg) scale(.68); }
 
-  .hero-names { font-size: clamp(52px, 17vw, 78px); }
+  .hero-names { font-size: calc(clamp(52px, 17vw, 78px) * var(--name-fit, 1)); }
   .hero-copy { font-size: 17px; }
   .hero-date { font-size: 11px; letter-spacing: .12em; }
 
@@ -1584,7 +1580,7 @@ body.loaded .name-word i { animation:letterRise .85s cubic-bezier(.2,.8,.2,1) fo
   .section { padding-left: 22px; padding-right: 22px; }
 
   .hero .devanagari { font-size: 19px; }
-  .hero-names { font-size: 49px; }
+  .hero-names { font-size: calc(49px * var(--name-fit, 1)); }
   .hero-names em { font-size: 38px; }
 
   .countdown > div { min-width: 52px; }
