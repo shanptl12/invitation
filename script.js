@@ -144,6 +144,7 @@
       body.classList.add("loaded");
       musicToggle.hidden = false;
       cover.classList.add("is-gone");
+      window.setTimeout(() => scrollCue?.classList.add("is-settled"), 3000);
       window.setTimeout(() => {
         cover.remove();
         body.classList.remove("cover-opening");
@@ -193,6 +194,7 @@
   const progress = document.querySelector(".progress-bar span");
   const timelineProgress = document.querySelector(".timeline-progress span");
   const celebration = document.querySelector("#celebrations");
+  const scrollCue = document.querySelector(".scroll-cue");
   const mandapArt = document.querySelector(".venue-art .mandap");
   const mandapBg = mandapArt?.querySelector(".parallax-bg");
   const mandapFg = mandapArt?.querySelector(".parallax-fg");
@@ -203,6 +205,11 @@
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     const pageProgress = maxScroll > 0 ? scrollTop / maxScroll : 0;
     progress.style.width = `${pageProgress * 100}%`;
+
+    if (scrollCue) {
+      const atBottom = scrollTop + window.innerHeight >= document.documentElement.scrollHeight - 80;
+      scrollCue.classList.toggle("is-hidden", atBottom);
+    }
 
     if (celebration && timelineProgress) {
       const rect = celebration.getBoundingClientRect();

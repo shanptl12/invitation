@@ -597,6 +597,15 @@ body.loaded .scroll-cue {
   transition-delay: 2.2s;
 }
 
+body.loaded .scroll-cue.is-settled {
+  transition-delay: 0s;
+}
+
+body.loaded .scroll-cue.is-hidden {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
 .scroll-cue span {
   display: flex;
   align-items: center;
